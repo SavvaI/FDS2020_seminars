@@ -11,6 +11,7 @@ import zipfile
 import argparse
 from sklearn.ensemble import GradientBoostingRegressor
 from dask.distributed import Client
+import src
 
 
 
@@ -38,6 +39,9 @@ def run():
     client = Client(threads_per_worker=5,
     n_workers=5, memory_limit='1GB')
     params = {'max_depth': [1, 2, 3], 'n_estimators': [1, 2, 3]}
+    d = src.misc.concat_df(src.misc.list_df_dir("./data/nycflights/"))
+    data = src.ml.prepare_data(d[features], 'DepDelay')
+    x_train, x_test, y_train, y_test = data
     metric, best_estimator = src.ml.hyperparametr_search(GradientBoostingRegressor(random_state=42), params, x_train, x_test, y_train, y_test)
     return metric, best_estimator
     
